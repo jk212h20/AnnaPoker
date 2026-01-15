@@ -34,6 +34,7 @@ const menuItems = document.querySelectorAll('.menu-item');
 const rankingMode = document.getElementById('ranking-mode');
 const outsMode = document.getElementById('outs-mode');
 const whichwinsMode = document.getElementById('whichwins-mode');
+const namehandMode = document.getElementById('namehand-mode');
 
 // Initialize the app
 function init() {
@@ -48,6 +49,9 @@ function init() {
     
     // Initialize which wins mode
     initWhichWinsMode();
+    
+    // Initialize name hand mode
+    initNameHandMode();
     
     // Start with ranking mode
     newRound();
@@ -97,7 +101,8 @@ function switchMode(mode) {
     rankingMode.classList.add('hidden');
     outsMode.classList.add('hidden');
     whichwinsMode.classList.add('hidden');
-    document.body.classList.remove('outs-theme', 'whichwins-theme');
+    namehandMode.classList.add('hidden');
+    document.body.classList.remove('outs-theme', 'whichwins-theme', 'namehand-theme');
     
     // Show selected mode
     if (mode === 'ranking') {
@@ -111,6 +116,10 @@ function switchMode(mode) {
         outsMode.classList.remove('hidden');
         document.body.classList.add('outs-theme');
         newOutsRound();
+    } else if (mode === 'namehand') {
+        namehandMode.classList.remove('hidden');
+        document.body.classList.add('namehand-theme');
+        newNameHandRound();
     }
 }
 

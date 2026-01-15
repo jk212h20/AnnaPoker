@@ -798,6 +798,127 @@ header h1 {
     background: rgba(91, 192, 235, 0.1);
 }
 
+/* ==================== NAME THAT HAND MODE STYLES ==================== */
+
+/* Name Hand Mode Color Theme - Green/Teal */
+.namehand-theme {
+    --bg-color: #1a2e28;
+    --accent: #50c878;
+    --success: #50c878;
+    --hand-bg: #1e3e35;
+    --hand-selected: #286050;
+    --hand-correct: #1b4332;
+}
+
+.nh-display {
+    text-align: center;
+    padding: 8px 0;
+}
+
+.nh-display h2 {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+}
+
+.nh-cards {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+
+.nh-hand-desc {
+    font-size: 0.85rem;
+    color: var(--accent);
+    min-height: 1.4em;
+    font-weight: 500;
+}
+
+.nh-choices {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding: 8px 0;
+}
+
+.nh-choice {
+    padding: 12px 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border: 2px solid var(--hand-bg);
+    border-radius: 8px;
+    background: var(--hand-bg);
+    color: var(--text-color);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.nh-choice:active {
+    transform: scale(0.95);
+}
+
+.nh-choice:hover {
+    border-color: var(--accent);
+}
+
+.nh-choice.selected {
+    border-color: var(--accent);
+    background: var(--hand-selected);
+}
+
+.nh-choice.correct {
+    border-color: var(--success);
+    background: var(--hand-correct);
+}
+
+.nh-choice.wrong {
+    border-color: var(--danger);
+    background: var(--hand-wrong);
+}
+
+.nh-choice:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+#nh-result-message {
+    font-size: 1.4rem;
+    margin-bottom: 16px;
+}
+
+.result.perfect #nh-result-message {
+    color: var(--success);
+}
+
+.result.failed #nh-result-message {
+    color: var(--danger);
+}
+
+.namehand-theme .menu-item.active {
+    background: rgba(80, 200, 120, 0.1);
+}
+
+/* Responsive adjustments for Name That Hand */
+@media (max-width: 360px) {
+    .nh-choices {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .nh-choice {
+        padding: 10px 6px;
+        font-size: 0.8rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .nh-choice {
+        padding: 14px 12px;
+        font-size: 0.95rem;
+    }
+}
+
 /* Hidden utility */
 .hidden {
     display: none !important;
