@@ -1,7 +1,7 @@
 // Service Worker for Poker Hand Trainer
 // Enables offline functionality by caching all app resources
 
-const CACHE_NAME = 'poker-trainer-v2';
+const CACHE_NAME = 'poker-trainer-v3';
 
 // Files to cache for offline use
 const FILES_TO_CACHE = [
@@ -14,6 +14,7 @@ const FILES_TO_CACHE = [
   '/js/outs.js',
   '/js/whichwins.js',
   '/js/namehand.js',
+  '/js/pick5.js',
   '/js/app.js',
   '/manifest.json',
   '/icons/icon-192.svg',

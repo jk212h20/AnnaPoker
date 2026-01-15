@@ -35,6 +35,7 @@ const rankingMode = document.getElementById('ranking-mode');
 const outsMode = document.getElementById('outs-mode');
 const whichwinsMode = document.getElementById('whichwins-mode');
 const namehandMode = document.getElementById('namehand-mode');
+const pick5Mode = document.getElementById('pick5-mode');
 
 // Initialize the app
 function init() {
@@ -52,6 +53,9 @@ function init() {
     
     // Initialize name hand mode
     initNameHandMode();
+    
+    // Initialize pick 5 mode
+    initPick5Mode();
     
     // Start with ranking mode
     newRound();
@@ -102,7 +106,8 @@ function switchMode(mode) {
     outsMode.classList.add('hidden');
     whichwinsMode.classList.add('hidden');
     namehandMode.classList.add('hidden');
-    document.body.classList.remove('outs-theme', 'whichwins-theme', 'namehand-theme');
+    pick5Mode.classList.add('hidden');
+    document.body.classList.remove('outs-theme', 'whichwins-theme', 'namehand-theme', 'pick5-theme');
     
     // Show selected mode
     if (mode === 'ranking') {
@@ -120,6 +125,10 @@ function switchMode(mode) {
         namehandMode.classList.remove('hidden');
         document.body.classList.add('namehand-theme');
         newNameHandRound();
+    } else if (mode === 'pick5') {
+        pick5Mode.classList.remove('hidden');
+        document.body.classList.add('pick5-theme');
+        newPick5Round();
     }
 }
 
