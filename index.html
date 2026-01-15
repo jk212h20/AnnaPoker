@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Poker Hand Trainer</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div id="app">
+        <header>
+            <div class="streak">🔥 <span id="streak">0</span></div>
+            <h1>Rank the Hands</h1>
+            <div class="score">✓ <span id="correct">0</span>/<span id="total">0</span></div>
+        </header>
+
+        <section id="board" class="board">
+            <h2>Board</h2>
+            <div class="cards" id="board-cards">
+                <!-- 5 community cards -->
+            </div>
+        </section>
+
+        <section id="instruction">
+            <p>Tap hands from <strong>strongest</strong> to <strong>weakest</strong></p>
+        </section>
+
+        <section id="hands" class="hands">
+            <!-- 4 player hands -->
+        </section>
+
+        <section id="result" class="result hidden">
+            <div id="result-message"></div>
+            <button id="next-btn" class="btn-next">Next Hand →</button>
+        </section>
+
+        <section id="rankings" class="rankings hidden">
+            <h3>Correct Order:</h3>
+            <ol id="rankings-list"></ol>
+        </section>
+    </div>
+
+    <script src="js/cards.js"></script>
+    <script src="js/poker.js"></script>
+    <script src="js/templates.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
