@@ -115,17 +115,18 @@ function calculateOuts(board, yourCards, opponentCards) {
     
     // If we're currently ahead, no outs needed to win
     if (currentComparison > 0) {
-        return { outs: 0, outCards: [], status: 'ahead' };
+        return { outs: 0, outCards: [], status: 'ahead', hasChopOuts: false };
     }
     
     // If currently tied, this is a tie scenario
     if (currentComparison === 0) {
-        return { outs: -1, outCards: [], status: 'tied' };
+        return { outs: -1, outCards: [], status: 'tied', hasChopOuts: true };
     }
     
     // We're behind - count cards that make us win
     let outs = 0;
     const outCards = [];
+    let hasChopOuts = false;
     
     for (const riverCard of remainingDeck) {
         const newBoard = [...board, riverCard];
@@ -138,14 +139,17 @@ function calculateOuts(board, yourCards, opponentCards) {
         if (comparison > 0) {
             outs++;
             outCards.push(riverCard);
+        } else if (comparison === 0) {
+            // This river card would result in a chop
+            hasChopOuts = true;
         }
     }
     
-    return { outs, outCards, status: 'behind' };
+    return { outs, outCards, status: 'behind', hasChopOuts };
 }
 
 
-// Check if scenario is valid (not tied, player is behind)
+// Check if scenario is valid (not tied, player is behind, no chop outs)
 function isValidScenario(board, yourCards, opponentCards) {
     const result = calculateOuts(board, yourCards, opponentCards);
     
@@ -155,9 +159,8 @@ function isValidScenario(board, yourCards, opponentCards) {
     // Skip if already ahead (0 outs needed)
     if (result.status === 'ahead') return false;
     
-    // Skip if drawing dead (might be frustrating for beginners)
-    // Actually let's keep these - they're educational
-    // if (result.outs === 0) return false;
+    // Skip if any river card could result in a chop
+    if (result.hasChopOuts) return false;
     
     return true;
 }
