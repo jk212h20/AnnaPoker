@@ -5,46 +5,106 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Poker Hand Trainer</title>
+    <title>Poker Trainer</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
     <div id="app">
-        <header>
-            <div class="streak">🔥 <span id="streak">0</span></div>
-            <h1>Rank the Hands</h1>
-            <div class="score">✓ <span id="correct">0</span>/<span id="total">0</span></div>
-        </header>
-
-        <section id="board" class="board">
-            <h2>Board</h2>
-            <div class="cards" id="board-cards">
-                <!-- 5 community cards -->
+        <!-- Mode Menu -->
+        <nav class="mode-menu">
+            <button class="menu-toggle" id="menu-toggle">☰</button>
+            <div class="menu-dropdown hidden" id="menu-dropdown">
+                <button class="menu-item active" data-mode="ranking">Hand Ranking</button>
+                <button class="menu-item" data-mode="outs">Outs Counter</button>
             </div>
-        </section>
+        </nav>
 
-        <section id="instruction">
-            <p>Tap hands from <strong>strongest</strong> to <strong>weakest</strong></p>
-        </section>
+        <!-- ==================== RANKING MODE ==================== -->
+        <div id="ranking-mode" class="game-mode">
+            <header>
+                <div class="streak">🔥 <span id="streak">0</span></div>
+                <h1>Rank the Hands</h1>
+                <div class="score">✓ <span id="correct">0</span>/<span id="total">0</span></div>
+            </header>
 
-        <section id="hands" class="hands">
-            <!-- 4 player hands -->
-        </section>
+            <section id="board" class="board">
+                <h2>Board</h2>
+                <div class="cards" id="board-cards">
+                    <!-- 5 community cards -->
+                </div>
+            </section>
 
-        <section id="result" class="result hidden">
-            <div id="result-message"></div>
-            <button id="next-btn" class="btn-next">Next Hand →</button>
-        </section>
+            <section id="instruction">
+                <p>Tap hands from <strong>strongest</strong> to <strong>weakest</strong></p>
+            </section>
 
-        <section id="rankings" class="rankings hidden">
-            <h3>Correct Order:</h3>
-            <ol id="rankings-list"></ol>
-        </section>
+            <section id="hands" class="hands">
+                <!-- 4 player hands -->
+            </section>
+
+            <section id="result" class="result hidden">
+                <div id="result-message"></div>
+                <button id="next-btn" class="btn-next">Next Hand →</button>
+            </section>
+
+            <section id="rankings" class="rankings hidden">
+                <h3>Correct Order:</h3>
+                <ol id="rankings-list"></ol>
+            </section>
+        </div>
+
+        <!-- ==================== OUTS MODE ==================== -->
+        <div id="outs-mode" class="game-mode hidden">
+            <header>
+                <div class="streak">🔥 <span id="outs-streak">0</span></div>
+                <h1>Count Your Outs</h1>
+                <div class="score">✓ <span id="outs-correct">0</span>/<span id="outs-total">0</span></div>
+            </header>
+
+            <section class="board outs-board">
+                <h2>Turn</h2>
+                <div class="cards" id="outs-board-cards">
+                    <!-- 4 community cards -->
+                </div>
+            </section>
+
+            <section class="outs-hands-container">
+                <div class="outs-hand-section">
+                    <h3>Your Hand</h3>
+                    <div class="cards" id="your-hand-cards"></div>
+                    <div class="hand-description" id="your-hand-desc"></div>
+                </div>
+                <div class="outs-hand-section opponent">
+                    <h3>Opponent</h3>
+                    <div class="cards" id="opponent-hand-cards"></div>
+                    <div class="hand-description" id="opponent-hand-desc"></div>
+                </div>
+            </section>
+
+            <section class="outs-scenario" id="outs-scenario">
+                <p id="scenario-text">How many outs do you have to win?</p>
+            </section>
+
+            <section class="outs-input-section">
+                <div class="outs-input-wrapper">
+                    <input type="number" id="outs-input" class="outs-input" placeholder="?" min="0" max="52" inputmode="numeric">
+                    <span class="outs-label">outs</span>
+                </div>
+                <button id="check-outs-btn" class="btn-check">Check</button>
+            </section>
+
+            <section id="outs-result" class="result hidden">
+                <div id="outs-result-message"></div>
+                <div id="outs-explanation" class="outs-explanation"></div>
+                <button id="next-outs-btn" class="btn-next">Next Scenario →</button>
+            </section>
+        </div>
     </div>
 
     <script src="js/cards.js"></script>
     <script src="js/poker.js"></script>
     <script src="js/templates.js"></script>
+    <script src="js/outs.js"></script>
     <script src="js/app.js"></script>
 </body>
 </html>

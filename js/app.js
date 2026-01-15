@@ -1,6 +1,9 @@
 // Main application logic for Poker Hand Trainer
 
-// Game state
+// Current mode
+let currentMode = 'ranking';
+
+// Game state for ranking mode
 let currentBoard = [];
 let currentHands = [];
 let correctOrder = [];
@@ -11,7 +14,7 @@ let correctCount = 0;
 let totalCount = 0;
 let gameEnded = false;
 
-// DOM elements
+// DOM elements for ranking mode
 const boardCardsEl = document.getElementById('board-cards');
 const handsEl = document.getElementById('hands');
 const resultEl = document.getElementById('result');
@@ -24,13 +27,83 @@ const correctEl = document.getElementById('correct');
 const totalEl = document.getElementById('total');
 const instructionEl = document.getElementById('instruction');
 
-// Initialize the game
+// DOM elements for mode switching
+const menuToggle = document.getElementById('menu-toggle');
+const menuDropdown = document.getElementById('menu-dropdown');
+const menuItems = document.querySelectorAll('.menu-item');
+const rankingMode = document.getElementById('ranking-mode');
+const outsMode = document.getElementById('outs-mode');
+
+// Initialize the app
 function init() {
+    // Initialize ranking mode
     nextBtn.addEventListener('click', newRound);
+    
+    // Initialize mode menu
+    initModeMenu();
+    
+    // Initialize outs mode
+    initOutsMode();
+    
+    // Start with ranking mode
     newRound();
 }
 
-// Start a new round
+// Initialize mode menu functionality
+function initModeMenu() {
+    // Toggle menu
+    menuToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        menuDropdown.classList.toggle('hidden');
+    });
+    
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!menuDropdown.contains(e.target) && e.target !== menuToggle) {
+            menuDropdown.classList.add('hidden');
+        }
+    });
+    
+    // Handle menu item clicks
+    menuItems.forEach(item => {
+        item.addEventListener('click', () => {
+            const mode = item.dataset.mode;
+            switchMode(mode);
+            menuDropdown.classList.add('hidden');
+        });
+    });
+}
+
+// Switch between game modes
+function switchMode(mode) {
+    if (mode === currentMode) return;
+    
+    currentMode = mode;
+    
+    // Update menu item states
+    menuItems.forEach(item => {
+        if (item.dataset.mode === mode) {
+            item.classList.add('active');
+        } else {
+            item.classList.remove('active');
+        }
+    });
+    
+    // Switch visible mode
+    if (mode === 'ranking') {
+        rankingMode.classList.remove('hidden');
+        outsMode.classList.add('hidden');
+        document.body.classList.remove('outs-theme');
+        newRound();
+    } else if (mode === 'outs') {
+        rankingMode.classList.add('hidden');
+        outsMode.classList.remove('hidden');
+        document.body.classList.add('outs-theme');
+        newOutsRound();
+    }
+}
+
+// Start a new round (ranking mode)
 function newRound() {
     // Reset state
     userOrder = [];
