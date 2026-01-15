@@ -7,6 +7,7 @@ let nhStreak = 0;
 let nhCorrectCount = 0;
 let nhTotalCount = 0;
 let nhGameEnded = false;
+let nhCardCount = 5; // 5, 6, or 7 cards
 
 // Hand type options (what the player can choose)
 const HAND_OPTIONS = [
@@ -249,8 +250,49 @@ function initNameHandMode() {
     
     nextNhBtn.addEventListener('click', newNameHandRound);
     
+    // Initialize card count buttons
+    initCardCountButtons();
+    
     // Create choice buttons
     createChoiceButtons();
+}
+
+// Initialize card count setting buttons
+function initCardCountButtons() {
+    const countBtns = document.querySelectorAll('.nh-count-btn');
+    countBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            // Update active state
+            countBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            // Update card count
+            nhCardCount = parseInt(btn.dataset.count);
+            
+            // Start new round with new card count
+            newNameHandRound();
+        });
+    });
+}
+
+// Evaluate best 5-card hand from N cards (5, 6, or 7)
+function evaluateBestHand(cards) {
+    if (cards.length === 5) {
+        return evaluate5Cards(cards);
+    }
+    
+    // For 6 or 7 cards, find the best 5-card combination
+    const combinations = getCombinations(cards, 5);
+    let bestHand = null;
+    
+    for (const combo of combinations) {
+        const hand = evaluate5Cards(combo);
+        if (!bestHand || compareHands(hand, bestHand) > 0) {
+            bestHand = hand;
+        }
+    }
+    
+    return bestHand;
 }
 
 // Create the hand type choice buttons
@@ -282,7 +324,12 @@ function selectWeightedGenerator() {
 
 // Generate a hand scenario
 function generateNhScenario() {
-    // Try weighted generator first
+    // For 6 or 7 cards, just deal random cards (more realistic)
+    if (nhCardCount > 5) {
+        return deal(shuffle(createDeck()), nhCardCount);
+    }
+    
+    // For 5 cards, try weighted generator first
     for (let attempts = 0; attempts < 20; attempts++) {
         const generator = selectWeightedGenerator();
         try {
@@ -312,18 +359,18 @@ function newNameHandRound() {
         btn.disabled = false;
     });
     
-    // Generate scenario
+    // Generate scenario based on card count
     nhCards = generateNhScenario();
     
-    // Evaluate the hand
-    const hand = evaluate5Cards(nhCards);
+    // Evaluate the best hand from all cards
+    const hand = evaluateBestHand(nhCards);
     nhCorrectAnswer = hand.rank;
     
     // Render cards
     renderNhCards();
 }
 
-// Render the 5-card hand
+// Render the cards
 function renderNhCards() {
     nhCardsEl.innerHTML = '';
     
@@ -353,8 +400,8 @@ function makeNhChoice(chosenRank) {
     const selectedBtn = nhChoicesEl.querySelector(`[data-rank="${chosenRank}"]`);
     selectedBtn.classList.add('selected');
     
-    // Show the hand description
-    const hand = evaluate5Cards(nhCards);
+    // Show the hand description (best 5-card hand)
+    const hand = evaluateBestHand(nhCards);
     nhHandDescEl.textContent = getHandDescription(hand);
     
     if (correct) {
