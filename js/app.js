@@ -33,6 +33,7 @@ const menuDropdown = document.getElementById('menu-dropdown');
 const menuItems = document.querySelectorAll('.menu-item');
 const rankingMode = document.getElementById('ranking-mode');
 const outsMode = document.getElementById('outs-mode');
+const whichwinsMode = document.getElementById('whichwins-mode');
 
 // Initialize the app
 function init() {
@@ -44,6 +45,9 @@ function init() {
     
     // Initialize outs mode
     initOutsMode();
+    
+    // Initialize which wins mode
+    initWhichWinsMode();
     
     // Start with ranking mode
     newRound();
@@ -89,14 +93,21 @@ function switchMode(mode) {
         }
     });
     
-    // Switch visible mode
+    // Hide all modes
+    rankingMode.classList.add('hidden');
+    outsMode.classList.add('hidden');
+    whichwinsMode.classList.add('hidden');
+    document.body.classList.remove('outs-theme', 'whichwins-theme');
+    
+    // Show selected mode
     if (mode === 'ranking') {
         rankingMode.classList.remove('hidden');
-        outsMode.classList.add('hidden');
-        document.body.classList.remove('outs-theme');
         newRound();
+    } else if (mode === 'whichwins') {
+        whichwinsMode.classList.remove('hidden');
+        document.body.classList.add('whichwins-theme');
+        newWhichWinsRound();
     } else if (mode === 'outs') {
-        rankingMode.classList.add('hidden');
         outsMode.classList.remove('hidden');
         document.body.classList.add('outs-theme');
         newOutsRound();

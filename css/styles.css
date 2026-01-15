@@ -29,6 +29,16 @@
     --hand-correct: #2d4a32;
 }
 
+/* Which Wins Mode Color Theme - Blue/Cyan */
+.whichwins-theme {
+    --bg-color: #1a2430;
+    --accent: #5bc0eb;
+    --success: #5bc0eb;
+    --hand-bg: #1e3040;
+    --hand-selected: #264060;
+    --hand-correct: #1b4332;
+}
+
 html, body {
     height: 100%;
     overflow-x: hidden;
@@ -554,7 +564,39 @@ header h1 {
     background: rgba(255,255,255,0.05);
     border-radius: 8px;
     margin-bottom: 16px;
-    text-align: left;
+    text-align: center;
+}
+
+.outs-cards-label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+}
+
+.outs-cards-display {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4px;
+}
+
+.out-card {
+    display: inline-block;
+    padding: 4px 6px;
+    background: var(--card-bg);
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    min-width: 32px;
+    text-align: center;
+}
+
+.out-card.red {
+    color: #e63946;
+}
+
+.out-card.black {
+    color: #1d3557;
 }
 
 /* Animations */
@@ -639,6 +681,121 @@ header h1 {
         height: 56px;
         font-size: 1.8rem;
     }
+}
+
+/* ==================== WHICH WINS MODE STYLES ==================== */
+.ww-board {
+    margin-bottom: 12px;
+}
+
+.ww-hands-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.ww-hand {
+    background: var(--hand-bg);
+    border-radius: 10px;
+    padding: 12px;
+    text-align: center;
+    flex: 1;
+    max-width: 160px;
+}
+
+.ww-hand h3 {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+}
+
+.ww-hand .cards {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    margin-bottom: 6px;
+}
+
+.ww-vs {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--text-muted);
+    padding: 0 8px;
+}
+
+.ww-choices {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    padding: 8px 0;
+}
+
+.ww-choice {
+    flex: 1;
+    max-width: 120px;
+    padding: 14px 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    border: 3px solid var(--hand-bg);
+    border-radius: 10px;
+    background: var(--hand-bg);
+    color: var(--text-color);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.ww-choice:active {
+    transform: scale(0.95);
+}
+
+.ww-choice:hover {
+    border-color: var(--accent);
+}
+
+.ww-choice.ww-choice-tie {
+    background: transparent;
+    border-color: var(--text-muted);
+}
+
+.ww-choice.selected {
+    border-color: var(--accent);
+    background: var(--hand-selected);
+}
+
+.ww-choice.correct {
+    border-color: var(--success);
+    background: var(--hand-correct);
+}
+
+.ww-choice.wrong {
+    border-color: var(--danger);
+    background: var(--hand-wrong);
+}
+
+.ww-choice:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+#ww-result-message {
+    font-size: 1.4rem;
+    margin-bottom: 16px;
+}
+
+.result.perfect #ww-result-message {
+    color: var(--success);
+}
+
+.result.failed #ww-result-message {
+    color: var(--danger);
+}
+
+.whichwins-theme .menu-item.active {
+    background: rgba(91, 192, 235, 0.1);
 }
 
 /* Hidden utility */

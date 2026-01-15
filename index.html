@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Poker Trainer</title>
     <link rel="stylesheet" href="css/styles.css">
@@ -15,6 +15,7 @@
             <button class="menu-toggle" id="menu-toggle">☰</button>
             <div class="menu-dropdown hidden" id="menu-dropdown">
                 <button class="menu-item active" data-mode="ranking">Hand Ranking</button>
+                <button class="menu-item" data-mode="whichwins">Which Wins?</button>
                 <button class="menu-item" data-mode="outs">Outs Counter</button>
             </div>
         </nav>
@@ -50,6 +51,45 @@
             <section id="rankings" class="rankings hidden">
                 <h3>Correct Order:</h3>
                 <ol id="rankings-list"></ol>
+            </section>
+        </div>
+
+        <!-- ==================== WHICH WINS MODE ==================== -->
+        <div id="whichwins-mode" class="game-mode hidden">
+            <header>
+                <div class="streak">🔥 <span id="ww-streak">0</span></div>
+                <h1>Which Wins?</h1>
+                <div class="score">✓ <span id="ww-correct">0</span>/<span id="ww-total">0</span></div>
+            </header>
+
+            <section class="board ww-board">
+                <h2>Board</h2>
+                <div class="cards" id="ww-board-cards"></div>
+            </section>
+
+            <section class="ww-hands-container">
+                <div class="ww-hand" id="ww-hand1">
+                    <h3>Hand 1</h3>
+                    <div class="cards" id="ww-hand1-cards"></div>
+                    <div class="hand-description" id="ww-hand1-desc"></div>
+                </div>
+                <div class="ww-vs">VS</div>
+                <div class="ww-hand" id="ww-hand2">
+                    <h3>Hand 2</h3>
+                    <div class="cards" id="ww-hand2-cards"></div>
+                    <div class="hand-description" id="ww-hand2-desc"></div>
+                </div>
+            </section>
+
+            <section class="ww-choices">
+                <button class="ww-choice" id="ww-choice-1" data-choice="1">Hand 1</button>
+                <button class="ww-choice ww-choice-tie" id="ww-choice-tie" data-choice="tie">Tie</button>
+                <button class="ww-choice" id="ww-choice-2" data-choice="2">Hand 2</button>
+            </section>
+
+            <section id="ww-result" class="result hidden">
+                <div id="ww-result-message"></div>
+                <button id="next-ww-btn" class="btn-next">Next Hand →</button>
             </section>
         </div>
 
@@ -105,6 +145,7 @@
     <script src="js/poker.js"></script>
     <script src="js/templates.js"></script>
     <script src="js/outs.js"></script>
+    <script src="js/whichwins.js"></script>
     <script src="js/app.js"></script>
 </body>
 </html>

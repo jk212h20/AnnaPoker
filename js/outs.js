@@ -305,14 +305,37 @@ function checkOutsAnswer() {
         outsInputEl.classList.add('wrong');
     }
     
-    // Hide explanation (removed - was unreliable)
-    outsExplanationEl.style.display = 'none';
+    // Show the out cards
+    displayOutCards();
     
     // Update stats
     updateOutsStats();
     
     // Show result
     outsResultEl.classList.remove('hidden');
+}
+
+// Display all the out cards
+function displayOutCards() {
+    const outCards = currentOutsScenario.outCards;
+    
+    if (outCards.length === 0) {
+        outsExplanationEl.innerHTML = '<div class="outs-cards-label">No outs - drawing dead</div>';
+    } else {
+        // Sort cards by rank for cleaner display
+        const sortedCards = sortByValue([...outCards]);
+        
+        let html = '<div class="outs-cards-label">Out cards:</div><div class="outs-cards-display">';
+        for (const card of sortedCards) {
+            const suitSymbol = SUIT_SYMBOLS[card.suit];
+            const isRed = card.suit === 'hearts' || card.suit === 'diamonds';
+            html += `<span class="out-card ${isRed ? 'red' : 'black'}">${card.rank}${suitSymbol}</span>`;
+        }
+        html += '</div>';
+        outsExplanationEl.innerHTML = html;
+    }
+    
+    outsExplanationEl.style.display = 'block';
 }
 
 // Update outs stats display
