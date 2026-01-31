@@ -610,9 +610,9 @@ function selectHsOption(option, element) {
                 const h = hands[i];
                 const c1 = h.cards[0];
                 const c2 = h.cards[1];
-                const color1 = (c1.suit === '♥' || c1.suit === '♦') ? 'red' : 'black';
-                const color2 = (c2.suit === '♥' || c2.suit === '♦') ? 'red' : 'black';
-                explanationHtml += `<span class="hs-combo"><span class="${color1}">${c1.rank}${c1.suit}</span><span class="${color2}">${c2.rank}${c2.suit}</span></span>`;
+                const color1 = (c1.suit === 'hearts' || c1.suit === 'diamonds') ? 'red' : 'black';
+                const color2 = (c2.suit === 'hearts' || c2.suit === 'diamonds') ? 'red' : 'black';
+                explanationHtml += `<span class="hs-combo"><span class="${color1}">${c1.display}${c1.symbol}</span><span class="${color2}">${c2.display}${c2.symbol}</span></span>`;
             }
             if (hands.length > showMax) {
                 explanationHtml += `<span class="hs-combo-more">+${hands.length - showMax} more</span>`;
