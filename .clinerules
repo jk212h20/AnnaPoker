@@ -1,0 +1,18 @@
+# AnnaPoker Project Rules
+
+## File Editing Strategy
+- When editing JavaScript files, use `replace_in_file` with small, targeted changes
+- Never try to rewrite an entire file at once with `write_to_file` - this causes content errors
+- Break large additions into multiple smaller `replace_in_file` operations (3-5 functions per operation max)
+- Always include the content parameter in the same tool call
+
+## Code Patterns
+- Template generators should use randomization to avoid exact repeats
+- Use the existing helper functions from cards.js: `createDeck()`, `shuffle()`, `removeCards()`, `sortByValue()`
+- Use poker.js functions: `evaluateHand()`, `compareHands()`, `getHandDescription()`
+- Generators should return null if they fail, and the caller will try another generator
+
+## Testing
+- Server runs on port 3000: `npm start`
+- Test hand ranking in "Rank the Hands" mode
+- Test hand comparison in "Which Wins?" mode

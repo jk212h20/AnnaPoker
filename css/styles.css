@@ -231,6 +231,37 @@ header h1 {
     color: var(--accent);
 }
 
+#instruction .instruction-hint {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    opacity: 0.7;
+    margin-top: 4px;
+}
+
+/* Reset Button */
+.btn-reset {
+    display: inline-block;
+    margin-top: 8px;
+    background: transparent;
+    color: var(--text-muted);
+    border: 2px solid var(--text-muted);
+    padding: 8px 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.btn-reset:hover {
+    color: var(--text-color);
+    border-color: var(--text-color);
+}
+
+.btn-reset:active {
+    transform: scale(0.95);
+}
+
 /* Hands Section */
 .hands {
     display: grid;
@@ -1131,6 +1162,455 @@ header h1 {
     .nh-choice {
         padding: 14px 12px;
         font-size: 0.95rem;
+    }
+}
+
+/* ==================== FIND THE NUTS MODE STYLES ==================== */
+
+/* Find Nuts Mode Color Theme - Gold/Orange */
+.findnuts-theme {
+    --bg-color: #2e2a1a;
+    --accent: #ffd700;
+    --success: #4ecca3;
+    --hand-bg: #3e351e;
+    --hand-selected: #605020;
+    --hand-correct: #1b4332;
+}
+
+.fn-settings {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 8px 0;
+}
+
+.fn-setting-label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.fn-size-btns {
+    display: flex;
+    gap: 6px;
+}
+
+.fn-size-btn {
+    padding: 8px 12px;
+    border: 2px solid var(--hand-bg);
+    border-radius: 8px;
+    background: var(--hand-bg);
+    color: var(--text-color);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.fn-size-btn:hover {
+    border-color: var(--accent);
+}
+
+.fn-size-btn.active {
+    border-color: var(--accent);
+    background: var(--accent);
+    color: var(--bg-color);
+}
+
+.fn-instruction {
+    text-align: center;
+    padding: 8px 0;
+}
+
+.fn-instruction p {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+}
+
+.fn-instruction strong {
+    color: var(--accent);
+}
+
+.fn-counter {
+    font-size: 1rem;
+    color: var(--accent);
+    font-weight: 600;
+}
+
+.fn-grid-container {
+    padding: 8px 0;
+}
+
+.fn-card-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    background: var(--hand-bg);
+    border-radius: 10px;
+    padding: 10px;
+}
+
+.fn-suit-row {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.fn-suit-label {
+    width: 20px;
+    font-size: 1.1rem;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.fn-suit-label.hearts,
+.fn-suit-label.diamonds {
+    color: #e63946;
+}
+
+.fn-suit-label.spades,
+.fn-suit-label.clubs {
+    color: #aaa;
+}
+
+.fn-grid-card {
+    flex: 1;
+    min-width: 24px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--card-bg);
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    border: 2px solid transparent;
+    user-select: none;
+}
+
+.fn-grid-card.hearts,
+.fn-grid-card.diamonds {
+    color: #e63946;
+}
+
+.fn-grid-card.spades,
+.fn-grid-card.clubs {
+    color: #1d3557;
+}
+
+.fn-grid-card:hover:not(.disabled) {
+    transform: scale(1.1);
+    z-index: 1;
+}
+
+.fn-grid-card.disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    background: #666;
+}
+
+.fn-grid-card.selected {
+    border-color: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+    transform: scale(1.1);
+    z-index: 1;
+}
+
+.fn-grid-card.correct {
+    border-color: var(--success);
+    background: #d4edda;
+}
+
+.fn-grid-card.wrong {
+    border-color: var(--danger);
+    background: #f8d7da;
+}
+
+.fn-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    padding: 12px 0;
+}
+
+.fn-nuts-display {
+    text-align: center;
+    padding: 12px;
+}
+
+.fn-nuts-label {
+    font-size: 1rem;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.fn-nuts-combos {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+}
+
+.fn-nut-combo {
+    display: flex;
+    gap: 4px;
+    background: rgba(255,255,255,0.05);
+    padding: 6px;
+    border-radius: 8px;
+}
+
+.fn-nut-combo .card {
+    width: 36px;
+    height: 50px;
+    font-size: 0.9rem;
+}
+
+.fn-nuts-more {
+    display: flex;
+    align-items: center;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.findnuts-theme .menu-item.active {
+    background: rgba(255, 215, 0, 0.1);
+}
+
+#fn-result-message {
+    font-size: 1.4rem;
+    margin-bottom: 16px;
+}
+
+.result.perfect #fn-result-message {
+    color: var(--success);
+}
+
+.result.failed #fn-result-message {
+    color: var(--danger);
+}
+
+/* Responsive adjustments for Find The Nuts */
+@media (max-width: 360px) {
+    .fn-grid-card {
+        min-width: 20px;
+        height: 28px;
+        font-size: 0.75rem;
+    }
+    
+    .fn-suit-label {
+        width: 16px;
+        font-size: 0.95rem;
+    }
+    
+    .fn-size-btn {
+        padding: 6px 8px;
+        font-size: 0.75rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .fn-grid-card {
+        min-width: 32px;
+        height: 40px;
+        font-size: 1rem;
+    }
+    
+    .fn-card-grid {
+        padding: 16px;
+        gap: 6px;
+    }
+}
+
+/* ==================== READ THE BOARD MODE STYLES ==================== */
+
+/* Read Board Mode Color Theme - Cyan/Blue */
+.readboard-theme {
+    --bg-color: #1a2530;
+    --accent: #00d4ff;
+    --success: #4ecca3;
+    --hand-bg: #1e3545;
+    --hand-selected: #264560;
+    --hand-correct: #1b4332;
+}
+
+.rb-settings {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 8px 0;
+}
+
+.rb-setting-label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.rb-size-btns {
+    display: flex;
+    gap: 6px;
+}
+
+.rb-size-btn {
+    padding: 8px 12px;
+    border: 2px solid var(--hand-bg);
+    border-radius: 8px;
+    background: var(--hand-bg);
+    color: var(--text-color);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.rb-size-btn:hover {
+    border-color: var(--accent);
+}
+
+.rb-size-btn.active {
+    border-color: var(--accent);
+    background: var(--accent);
+    color: var(--bg-color);
+}
+
+.rb-board {
+    margin-bottom: 16px;
+}
+
+.rb-questions-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 8px 0;
+}
+
+.rb-question {
+    background: var(--hand-bg);
+    border-radius: 10px;
+    padding: 14px;
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+}
+
+.rb-question.correct {
+    border-color: var(--success);
+    background: var(--hand-correct);
+}
+
+.rb-question.wrong {
+    border-color: var(--danger);
+    background: var(--hand-wrong);
+}
+
+.rb-question-text {
+    font-size: 0.95rem;
+    color: var(--text-color);
+    margin-bottom: 10px;
+}
+
+.rb-answer-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.rb-answer-btn {
+    flex: 1;
+    max-width: 100px;
+    padding: 10px 16px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border: 2px solid var(--text-muted);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text-color);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.rb-answer-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.rb-answer-btn.selected {
+    border-color: var(--accent);
+    background: var(--accent);
+    color: var(--bg-color);
+}
+
+.rb-answer-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.rb-answer-btn.correct-answer {
+    border-color: var(--success);
+    background: var(--success);
+    color: var(--bg-color);
+}
+
+.rb-actions {
+    display: flex;
+    justify-content: center;
+    padding: 12px 0;
+}
+
+#rb-result-message {
+    font-size: 1.4rem;
+    margin-bottom: 16px;
+}
+
+.result.perfect #rb-result-message {
+    color: var(--success);
+}
+
+.result.failed #rb-result-message {
+    color: var(--danger);
+}
+
+.readboard-theme .menu-item.active {
+    background: rgba(0, 212, 255, 0.1);
+}
+
+/* Responsive adjustments for Read the Board */
+@media (max-width: 360px) {
+    .rb-question {
+        padding: 10px;
+    }
+    
+    .rb-question-text {
+        font-size: 0.85rem;
+    }
+    
+    .rb-answer-btn {
+        padding: 8px 12px;
+        font-size: 0.85rem;
+    }
+    
+    .rb-size-btn {
+        padding: 6px 8px;
+        font-size: 0.75rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .rb-question {
+        padding: 18px;
+    }
+    
+    .rb-question-text {
+        font-size: 1.05rem;
+    }
+    
+    .rb-answer-btn {
+        padding: 12px 20px;
+        font-size: 1rem;
+        max-width: 120px;
     }
 }
 

@@ -332,6 +332,795 @@ const SCENARIO_GENERATORS = [
             hand1: [highPairCard, others[0]],
             hand2: [lowPairCard, others[1]]
         };
+    },
+    
+    // ========== FLUSH VS STRAIGHT VS FULL HOUSE SCENARIOS ==========
+    
+    // Flush beats straight - classic confrontation
+    function flushBeatsStraight() {
+        const deck = shuffle(createDeck());
+        const flushSuit = SUITS[Math.floor(Math.random() * 4)];
+        
+        // Board: 3 cards of flush suit, 2 cards that enable straight
+        // Example: 9♠ 8♠ 5♠ 7♥ 6♦
+        const flushCards = deck.filter(c => c.suit === flushSuit);
+        const nonFlushCards = deck.filter(c => c.suit !== flushSuit);
+        
+        shuffle(flushCards);
+        shuffle(nonFlushCards);
+        
+        // Pick 3 flush cards that don't make a straight on board
+        const boardFlush = [flushCards[0], flushCards[1], flushCards[2]];
+        
+        // Pick 2 non-flush cards
+        const boardOther = [nonFlushCards[0], nonFlushCards[1]];
+        const board = [...boardFlush, ...boardOther];
+        
+        // Hand 1 gets 2 more flush cards (makes flush)
+        const hand1 = [flushCards[3], flushCards[4]];
+        
+        // Hand 2 gets cards that make a straight with board
+        const boardValues = board.map(c => c.value);
+        const remaining = removeCards(deck, [...board, ...hand1]);
+        
+        // Find straight-making cards
+        let hand2 = null;
+        for (let high = 14; high >= 6; high--) {
+            const needed = [];
+            for (let v = high; v > high - 5; v--) {
+                if (!boardValues.includes(v)) {
+                    const card = remaining.find(c => c.value === v && c.suit !== flushSuit);
+                    if (card) needed.push(card);
+                }
+            }
+            if (needed.length === 2) {
+                hand2 = needed;
+                break;
+            }
+        }
+        
+        if (!hand2) return null;
+        
+        return { board, hand1, hand2 };
+    },
+    
+    // Straight beats trips
+    function straightBeatsTrips() {
+        const deck = shuffle(createDeck());
+        
+        // Board with pair - one makes trips, other makes hidden straight
+        const tripRank = RANKS[Math.floor(Math.random() * 8) + 3]; // 5-Q
+        const tripValue = RANK_VALUES[tripRank];
+        const tripCards = deck.filter(c => c.rank === tripRank);
+        
+        // Board: pair + 3 scattered cards
+        const board = [tripCards[0], tripCards[1]];
+        const remaining = removeCards(deck, board);
+        
+        // Add cards that could form straight
+        const straightHigh = tripValue + 2;
+        if (straightHigh > 14) return null;
+        
+        const suits = shuffle([...SUITS]);
+        for (let v = straightHigh; v > straightHigh - 3; v--) {
+            if (v !== tripValue) {
+                const card = remaining.find(c => c.value === v);
+                if (card) board.push(card);
+            }
+        }
+        
+        if (board.length < 5) {
+            const filler = remaining.find(c => !board.includes(c) && c.value < tripValue - 2);
+            if (filler) board.push(filler);
+        }
+        
+        if (board.length < 5) return null;
+        
+        const finalRemaining = removeCards(deck, board);
+        
+        // Hand 1: completes straight
+        const straightCards = [];
+        for (let v = straightHigh; v > straightHigh - 5; v--) {
+            if (!board.find(c => c.value === v)) {
+                const card = finalRemaining.find(c => c.value === v);
+                if (card) straightCards.push(card);
+            }
+        }
+        
+        if (straightCards.length < 2) return null;
+        const hand1 = straightCards.slice(0, 2);
+        
+        // Hand 2: trips
+        const thirdTrip = finalRemaining.find(c => c.rank === tripRank);
+        if (!thirdTrip) return null;
+        
+        const kicker = finalRemaining.find(c => c.rank !== tripRank && !hand1.includes(c));
+        const hand2 = [thirdTrip, kicker];
+        
+        return { board, hand1, hand2 };
+    },
+    
+    // Full house beats flush
+    function fullHouseBeatsFlush() {
+        const deck = shuffle(createDeck());
+        const flushSuit = SUITS[Math.floor(Math.random() * 4)];
+        
+        // Board: pair + 3 of flush suit (but not all same suit)
+        const pairRank = RANKS[Math.floor(Math.random() * 13)];
+        const pairCards = deck.filter(c => c.rank === pairRank);
+        
+        const board = [pairCards[0], pairCards[1]];
+        const remaining = removeCards(deck, board);
+        
+        // Add 3 flush cards
+        const flushCards = remaining.filter(c => c.suit === flushSuit && c.rank !== pairRank);
+        shuffle(flushCards);
+        
+        if (flushCards.length < 5) return null;
+        board.push(flushCards[0], flushCards[1], flushCards[2]);
+        
+        const finalRemaining = removeCards(deck, board);
+        
+        // Hand 1: makes full house (trips up)
+        const thirdPair = finalRemaining.find(c => c.rank === pairRank);
+        if (!thirdPair) return null;
+        
+        // Find another pair on board to complete full house
+        const boardRanks = board.map(c => c.rank);
+        const boardPairRank = boardRanks.find(r => r !== pairRank && boardRanks.filter(x => x === r).length === 1);
+        const matchingCard = finalRemaining.find(c => c.rank === boardPairRank);
+        
+        if (!matchingCard) {
+            const anyCard = finalRemaining.find(c => c.rank !== pairRank && c.suit !== flushSuit);
+            if (!anyCard) return null;
+            return {
+                board,
+                hand1: [thirdPair, anyCard],
+                hand2: [flushCards[3], flushCards[4]]
+            };
+        }
+        
+        return {
+            board,
+            hand1: [thirdPair, matchingCard],
+            hand2: [flushCards[3], flushCards[4]]
+        };
+    },
+    
+    // Full house beats straight
+    function fullHouseBeatsStraight() {
+        const deck = shuffle(createDeck());
+        
+        // Board: trips + 2 cards enabling straight
+        const tripRank = RANKS[Math.floor(Math.random() * 9) + 2]; // 4-Q
+        const tripValue = RANK_VALUES[tripRank];
+        const tripCards = deck.filter(c => c.rank === tripRank).slice(0, 3);
+        
+        const board = [...tripCards];
+        const remaining = removeCards(deck, board);
+        
+        // Add straight-enabling cards
+        const straightHigh = tripValue + 2;
+        if (straightHigh > 14 || straightHigh < 5) return null;
+        
+        for (let v = straightHigh; v > straightHigh - 5; v--) {
+            if (v !== tripValue && board.length < 5) {
+                const card = remaining.find(c => c.value === v && c.rank !== tripRank);
+                if (card) board.push(card);
+            }
+        }
+        
+        if (board.length < 5) return null;
+        
+        const finalRemaining = removeCards(deck, board);
+        
+        // Hand 1: full house (pairs the board)
+        const boardValues = board.filter(c => c.rank !== tripRank).map(c => c.value);
+        const pairCard = finalRemaining.find(c => boardValues.includes(c.value));
+        if (!pairCard) return null;
+        
+        const filler1 = finalRemaining.find(c => c !== pairCard && c.rank !== tripRank);
+        const hand1 = [pairCard, filler1];
+        
+        // Hand 2: straight
+        const neededForStraight = [];
+        for (let v = straightHigh; v > straightHigh - 5; v--) {
+            if (!board.find(c => c.value === v)) {
+                const card = finalRemaining.find(c => c.value === v && c !== pairCard && c !== filler1);
+                if (card) neededForStraight.push(card);
+            }
+        }
+        
+        if (neededForStraight.length < 2) return null;
+        const hand2 = neededForStraight.slice(0, 2);
+        
+        return { board, hand1, hand2 };
+    },
+    
+    // ========== HIDDEN STRAIGHT SCENARIOS ==========
+    
+    // Gutshot straight - hidden connector
+    function gutshotStraight() {
+        const deck = shuffle(createDeck());
+        
+        // Board: A-K-J-7-2 style (gap in middle)
+        // Hand fills the gap for straight
+        const gapStart = 7 + Math.floor(Math.random() * 4); // 7-10 high for gap
+        
+        const board = [];
+        const suits = shuffle([...SUITS]);
+        
+        // Add cards around gap: high, skip one, lower
+        board.push(deck.find(c => c.value === gapStart + 3)); // e.g., Q
+        board.push(deck.find(c => c.value === gapStart + 2)); // e.g., J
+        // Skip gapStart + 1 (the gap)
+        board.push(deck.find(c => c.value === gapStart));     // e.g., 9
+        board.push(deck.find(c => c.value === gapStart - 1)); // e.g., 8
+        
+        // Add a random low card
+        const remaining = removeCards(deck, board);
+        const lowCard = remaining.find(c => c.value < gapStart - 2);
+        if (!lowCard) return null;
+        board.push(lowCard);
+        
+        // Check not flush
+        if (new Set(board.map(c => c.suit)).size === 1) return null;
+        
+        const finalRemaining = removeCards(deck, board);
+        
+        // Hand 1: fills the gutshot
+        const gutshotCard = finalRemaining.find(c => c.value === gapStart + 1);
+        if (!gutshotCard) return null;
+        const filler = finalRemaining.find(c => c !== gutshotCard && c.value < gapStart - 2);
+        if (!filler) return null;
+        const hand1 = [gutshotCard, filler];
+        
+        // Hand 2: pair or two pair (looks strong but loses)
+        const boardRanks = board.map(c => c.rank);
+        const pairMatch = finalRemaining.find(c => boardRanks.includes(c.rank) && c !== gutshotCard);
+        if (!pairMatch) return null;
+        const filler2 = finalRemaining.find(c => c !== gutshotCard && c !== pairMatch && c !== filler);
+        const hand2 = [pairMatch, filler2];
+        
+        return { board, hand1, hand2 };
+    },
+    
+    // Wheel straight (A-2-3-4-5) - Ace plays low
+    function wheelStraight() {
+        const deck = shuffle(createDeck());
+        
+        // Board: A-4-3-x-x or similar
+        const board = [];
+        board.push(deck.find(c => c.value === 14)); // Ace
+        board.push(deck.find(c => c.value === 4));  // 4
+        board.push(deck.find(c => c.value === 3));  // 3
+        
+        // Add 2 random high cards (not 2 or 5)
+        const remaining = removeCards(deck, board);
+        const highCards = remaining.filter(c => c.value >= 9 && c.value <= 13);
+        shuffle(highCards);
+        board.push(highCards[0], highCards[1]);
+        
+        if (new Set(board.map(c => c.suit)).size === 1) return null;
+        
+        const finalRemaining = removeCards(deck, board);
+        
+        // Hand 1: 5-2 for wheel
+        const five = finalRemaining.find(c => c.value === 5);
+        const two = finalRemaining.find(c => c.value === 2);
+        if (!five || !two) return null;
+        const hand1 = [five, two];
+        
+        // Hand 2: pair of high card (looks better but wheel wins)
+        const highBoardValues = board.filter(c => c.value >= 9).map(c => c.value);
+        const pairCard = finalRemaining.find(c => highBoardValues.includes(c.value));
+        if (!pairCard) return null;
+        const filler = finalRemaining.find(c => c !== five && c !== two && c !== pairCard);
+        const hand2 = [pairCard, filler];
+        
+        return { board, hand1, hand2 };
+    },
+    
+    // Broadway hidden - T-J-Q-K-A with gaps filled by hand
+    function broadwayHidden() {
+        const deck = shuffle(createDeck());
+        
+        // Board has 3 broadway cards with gaps
+        const broadwayValues = [14, 13, 12, 11, 10]; // A K Q J T
+        shuffle(broadwayValues);
+        const boardBroadway = broadwayValues.slice(0, 3);
+        const handBroadway = broadwayValues.slice(3, 5);
+        
+        const board = [];
+        for (const v of boardBroadway) {
+            const card = deck.find(c => c.value === v);
+            if (card) board.push(card);
+        }
+        
+        // Add 2 low cards to board
+        const remaining = removeCards(deck, board);
+        const lowCards = remaining.filter(c => c.value <= 7);
+        shuffle(lowCards);
+        board.push(lowCards[0], lowCards[1]);
+        
+        if (new Set(board.map(c => c.suit)).size === 1) return null;
+        
+        const finalRemaining = removeCards(deck, board);
+        
+        // Hand 1: completes broadway
+        const hand1 = [];
+        for (const v of handBroadway) {
+            const card = finalRemaining.find(c => c.value === v && !hand1.includes(c));
+            if (card) hand1.push(card);
+        }
+        if (hand1.length < 2) return null;
+        
+        // Hand 2: two pair using board cards
+        const boardLowValues = board.filter(c => c.value <= 7).map(c => c.value);
+        const pair1 = finalRemaining.find(c => boardLowValues.includes(c.value));
+        const pair2 = finalRemaining.find(c => boardLowValues.includes(c.value) && c !== pair1 && c.value !== pair1?.value);
+        
+        if (!pair1) {
+            const anyCard = finalRemaining.find(c => !hand1.includes(c));
+            const anyCard2 = finalRemaining.find(c => !hand1.includes(c) && c !== anyCard);
+            return { board, hand1, hand2: [anyCard, anyCard2] };
+        }
+        
+        const filler = finalRemaining.find(c => c !== pair1 && c !== pair2 && !hand1.includes(c));
+        const hand2 = [pair1, filler || pair2];
+        
+        return { board, hand1, hand2 };
+    },
+    
+    // One-card straight - four to straight on board
+    function oneCardStraight() {
+        const deck = shuffle(createDeck());
+        
+        // Board: 4 consecutive cards
+        const startVal = 5 + Math.floor(Math.random() * 6); // 5-10
+        const board = [];
+        
+        for (let v = startVal; v < startVal + 4; v++) {
+            const card = deck.find(c => c.value === v);
+            if (card) board.push(card);
+        }
+        
+        // Add one card that doesn't help straight
+        const remaining = removeCards(deck, board);
+        const nonHelper = remaining.find(c => c.value < startVal - 1 || c.value > startVal + 5);
+        if (!nonHelper) return null;
+        board.push(nonHelper);
+        
+        if (new Set(board.map(c => c.suit)).size === 1) return null;
+        
+        const finalRemaining = removeCards(deck, board);
+        
+        // Hand 1: has the straight-completing card (either end)
+        const topCard = finalRemaining.find(c => c.value === startVal + 4);
+        const bottomCard = finalRemaining.find(c => c.value === startVal - 1);
+        
+        if (!topCard && !bottomCard) return null;
+        const straightCard = topCard || bottomCard;
+        const filler = finalRemaining.find(c => c !== straightCard);
+        const hand1 = [straightCard, filler];
+        
+        // Hand 2: pair
+        const boardValues = board.map(c => c.value);
+        const pairCard = finalRemaining.find(c => boardValues.includes(c.value) && c !== straightCard && c !== filler);
+        if (!pairCard) return null;
+        const filler2 = finalRemaining.find(c => c !== straightCard && c !== filler && c !== pairCard);
+        const hand2 = [pairCard, filler2];
+        
+        return { board, hand1, hand2 };
+    },
+    
+    // Double belly buster - two gutshots possible
+    function doubleBellyBuster() {
+        const deck = shuffle(createDeck());
+        
+        // Board: cards like 3-5-7-9-K (two gaps that make straights)
+        // Hand has 4-6 which fills 3-4-5-6-7 straight
+        const board = [];
+        board.push(deck.find(c => c.value === 3));
+        board.push(deck.find(c => c.value === 5));
+        board.push(deck.find(c => c.value === 7));
+        
+        const remaining = removeCards(deck, board);
+        const highCards = remaining.filter(c => c.value >= 10);
+        shuffle(highCards);
+        board.push(highCards[0], highCards[1]);
+        
+        if (new Set(board.map(c => c.suit)).size === 1) return null;
+        
+        const finalRemaining = removeCards(deck, board);
+        
+        // Hand 1: 4-6 makes the straight
+        const four = finalRemaining.find(c => c.value === 4);
+        const six = finalRemaining.find(c => c.value === 6);
+        if (!four || !six) return null;
+        const hand1 = [four, six];
+        
+        // Hand 2: pair of high card
+        const highVal = board.filter(c => c.value >= 10).map(c => c.value)[0];
+        const pairCard = finalRemaining.find(c => c.value === highVal);
+        if (!pairCard) return null;
+        const filler = finalRemaining.find(c => c !== four && c !== six && c !== pairCard);
+        const hand2 = [pairCard, filler];
+        
+        return { board, hand1, hand2 };
+    },
+    
+    // Inside straight beats two pair
+    function insideStraightBeatsTwoPair() {
+        const deck = shuffle(createDeck());
+        
+        // Board: J-9-8-4-4 (pair on board, inside straight possible)
+        const startVal = 8 + Math.floor(Math.random() * 3); // 8-10
+        const board = [];
+        
+        board.push(deck.find(c => c.value === startVal + 2)); // e.g., J
+        board.push(deck.find(c => c.value === startVal));     // e.g., 9 (skip 10)
+        board.push(deck.find(c => c.value === startVal - 1)); // e.g., 8
+        
+        // Add a pair
+        const remaining = removeCards(deck, board);
+        const pairRank = RANKS[Math.floor(Math.random() * 5)]; // Low pair
+        const pairCards = remaining.filter(c => c.rank === pairRank).slice(0, 2);
+        board.push(pairCards[0], pairCards[1]);
+        
+        if (new Set(board.map(c => c.suit)).size === 1) return null;
+        
+        const finalRemaining = removeCards(deck, board);
+        
+        // Hand 1: fills inside straight
+        const insideCard = finalRemaining.find(c => c.value === startVal + 1); // The 10
+        const lowCard = finalRemaining.find(c => c.value === startVal - 2);    // The 7
+        if (!insideCard || !lowCard) return null;
+        const hand1 = [insideCard, lowCard];
+        
+        // Hand 2: makes two pair with board
+        const highBoardVal = Math.max(...board.filter(c => c.rank !== pairRank).map(c => c.value));
+        const pairMatch = finalRemaining.find(c => c.value === highBoardVal);
+        if (!pairMatch) return null;
+        const filler = finalRemaining.find(c => c !== insideCard && c !== lowCard && c !== pairMatch);
+        const hand2 = [pairMatch, filler];
+        
+        return { board, hand1, hand2 };
+    },
+    
+    // ========== MORE COMPLEX COMPARISONS ==========
+    
+    // Set over set - both hit trips with pocket pair
+    function setOverSet() {
+        const deck = shuffle(createDeck());
+        const ranks = shuffle([...RANKS]);
+        
+        // Two different pocket pairs
+        const highPairRank = ranks[0];
+        const lowPairRank = ranks[1];
+        const highVal = RANK_VALUES[highPairRank];
+        const lowVal = RANK_VALUES[lowPairRank];
+        
+        // Make sure high is actually higher
+        const [actualHigh, actualLow] = highVal > lowVal 
+            ? [highPairRank, lowPairRank] 
+            : [lowPairRank, highPairRank];
+        
+        const highPairCards = deck.filter(c => c.rank === actualHigh);
+        const lowPairCards = deck.filter(c => c.rank === actualLow);
+        
+        // Board has one of each pair + 3 randoms
+        const board = [highPairCards[0], lowPairCards[0]];
+        const remaining = removeCards(deck, [...highPairCards, ...lowPairCards]);
+        shuffle(remaining);
+        
+        // Add 3 random cards that don't pair either
+        const fillers = remaining.filter(c => c.rank !== actualHigh && c.rank !== actualLow).slice(0, 3);
+        board.push(...fillers);
+        
+        if (board.length < 5) return null;
+        
+        return {
+            board,
+            hand1: [highPairCards[1], highPairCards[2]], // Higher set
+            hand2: [lowPairCards[1], lowPairCards[2]]    // Lower set
+        };
+    },
+    
+    // Straight over straight - different high cards
+    function straightOverStraight() {
+        const deck = shuffle(createDeck());
+        
+        // Board has 3 consecutive middle cards
+        const midVal = 7 + Math.floor(Math.random() * 3); // 7-9
+        const board = [];
+        
+        for (let v = midVal; v <= midVal + 2; v++) {
+            const card = deck.find(c => c.value === v);
+            if (card) board.push(card);
+        }
+        
+        // Add 2 non-connecting cards
+        const remaining = removeCards(deck, board);
+        const nonConnectors = remaining.filter(c => 
+            c.value < midVal - 2 || c.value > midVal + 4
+        );
+        shuffle(nonConnectors);
+        board.push(nonConnectors[0], nonConnectors[1]);
+        
+        if (new Set(board.map(c => c.suit)).size === 1) return null;
+        
+        const finalRemaining = removeCards(deck, board);
+        
+        // Hand 1: higher straight (top end)
+        const topCard1 = finalRemaining.find(c => c.value === midVal + 3);
+        const topCard2 = finalRemaining.find(c => c.value === midVal + 4);
+        if (!topCard1 || !topCard2) return null;
+        const hand1 = [topCard1, topCard2];
+        
+        // Hand 2: lower straight (bottom end)
+        const bottomCard1 = finalRemaining.find(c => c.value === midVal - 1);
+        const bottomCard2 = finalRemaining.find(c => c.value === midVal - 2);
+        if (!bottomCard1 || !bottomCard2) return null;
+        const hand2 = [bottomCard1, bottomCard2];
+        
+        return { board, hand1, hand2 };
+    },
+    
+    // Nut flush vs second nut flush
+    function nutFlushVsSecondNut() {
+        const suit = SUITS[Math.floor(Math.random() * 4)];
+        const deck = shuffle(createDeck());
+        const suitedCards = sortByValue(deck.filter(c => c.suit === suit));
+        
+        if (suitedCards.length < 7) return null;
+        
+        // Board: 3 low-middle suited cards
+        const board = [suitedCards[5], suitedCards[6], suitedCards[7] || suitedCards[8]];
+        
+        // Add 2 non-suited cards
+        const nonSuited = deck.filter(c => c.suit !== suit);
+        board.push(nonSuited[0], nonSuited[1]);
+        
+        // Hand 1: Ace of suit (nut flush)
+        const aceOfSuit = suitedCards[0]; // Ace is highest
+        const filler1 = nonSuited[2];
+        const hand1 = [aceOfSuit, filler1];
+        
+        // Hand 2: King of suit (second nut)
+        const kingOfSuit = suitedCards[1];
+        const filler2 = nonSuited[3];
+        const hand2 = [kingOfSuit, filler2];
+        
+        return { board, hand1, hand2 };
+    },
+    
+    // Full house over full house - higher trips wins
+    function fullHouseOverFullHouse() {
+        const deck = shuffle(createDeck());
+        
+        // Board: two pairs
+        const ranks = shuffle([...RANKS]).slice(0, 3);
+        const pair1Cards = deck.filter(c => c.rank === ranks[0]).slice(0, 2);
+        const pair2Cards = deck.filter(c => c.rank === ranks[1]).slice(0, 2);
+        
+        const board = [...pair1Cards, ...pair2Cards];
+        const remaining = removeCards(deck, board);
+        
+        // Add one more card
+        const filler = remaining.find(c => c.rank !== ranks[0] && c.rank !== ranks[1]);
+        board.push(filler);
+        
+        const finalRemaining = removeCards(deck, board);
+        
+        // Determine which pair is higher
+        const pair1Val = RANK_VALUES[ranks[0]];
+        const pair2Val = RANK_VALUES[ranks[1]];
+        const [highRank, lowRank] = pair1Val > pair2Val 
+            ? [ranks[0], ranks[1]] 
+            : [ranks[1], ranks[0]];
+        
+        // Hand 1: trips up the higher pair
+        const thirdHigh = finalRemaining.find(c => c.rank === highRank);
+        const filler1 = finalRemaining.find(c => c.rank !== highRank && c.rank !== lowRank);
+        if (!thirdHigh) return null;
+        const hand1 = [thirdHigh, filler1];
+        
+        // Hand 2: trips up the lower pair
+        const thirdLow = finalRemaining.find(c => c.rank === lowRank);
+        const filler2 = finalRemaining.find(c => c !== thirdHigh && c !== filler1 && c.rank !== lowRank);
+        if (!thirdLow) return null;
+        const hand2 = [thirdLow, filler2];
+        
+        return { board, hand1, hand2 };
+    },
+    
+    // Counterfeit two pair
+    function counterfeitTwoPair() {
+        const deck = shuffle(createDeck());
+        
+        // Board starts with small pair, then gets bigger pair
+        // Player with small two pair gets counterfeited
+        const ranks = shuffle([...RANKS]);
+        const lowPairRank = ranks.find(r => RANK_VALUES[r] <= 6);
+        const midPairRank = ranks.find(r => RANK_VALUES[r] >= 8 && RANK_VALUES[r] <= 11);
+        const highKickerRank = ranks.find(r => RANK_VALUES[r] >= 12);
+        
+        if (!lowPairRank || !midPairRank || !highKickerRank) return null;
+        
+        const lowPair = deck.filter(c => c.rank === lowPairRank).slice(0, 2);
+        const midPair = deck.filter(c => c.rank === midPairRank).slice(0, 2);
+        
+        const board = [...lowPair, ...midPair];
+        const remaining = removeCards(deck, board);
+        
+        // Add a high card
+        const highCard = remaining.find(c => c.rank === highKickerRank);
+        board.push(highCard);
+        
+        const finalRemaining = removeCards(deck, board);
+        
+        // Hand 1: higher kicker (plays board two pair + kicker)
+        const bigKicker = sortByValue(finalRemaining.filter(c => 
+            c.rank !== lowPairRank && c.rank !== midPairRank
+        ))[0];
+        const filler1 = finalRemaining.find(c => c !== bigKicker);
+        const hand1 = [bigKicker, filler1];
+        
+        // Hand 2: had low pocket pair (counterfeited!)
+        const thirdLow = finalRemaining.find(c => c.rank === lowPairRank);
+        const smallKicker = finalRemaining.find(c => c !== thirdLow && c.value < bigKicker.value);
+        if (!thirdLow || !smallKicker) return null;
+        const hand2 = [thirdLow, smallKicker];
+        
+        return { board, hand1, hand2 };
+    },
+    
+    // Hidden flush beats obvious two pair
+    function hiddenFlushBeatsTwoPair() {
+        const deck = shuffle(createDeck());
+        const flushSuit = SUITS[Math.floor(Math.random() * 4)];
+        
+        // Board: pair + 2 flush cards + 1 other
+        const pairRank = RANKS[Math.floor(Math.random() * 10) + 2];
+        const pairCards = deck.filter(c => c.rank === pairRank).slice(0, 2);
+        
+        const board = [...pairCards];
+        const remaining = removeCards(deck, board);
+        
+        // Add 2 suited cards (not the pair rank)
+        const flushCards = remaining.filter(c => c.suit === flushSuit && c.rank !== pairRank);
+        shuffle(flushCards);
+        board.push(flushCards[0], flushCards[1]);
+        
+        // Add one non-flush card
+        const nonFlush = remaining.find(c => c.suit !== flushSuit && c.rank !== pairRank && !board.includes(c));
+        board.push(nonFlush);
+        
+        const finalRemaining = removeCards(deck, board);
+        
+        // Hand 1: flush (two more suited cards)
+        const flushHand = finalRemaining.filter(c => c.suit === flushSuit).slice(0, 2);
+        if (flushHand.length < 2) return null;
+        const hand1 = flushHand;
+        
+        // Hand 2: obvious two pair (pairs with board)
+        const boardRanks = board.filter(c => c.rank !== pairRank).map(c => c.rank);
+        const pairMatch = finalRemaining.find(c => boardRanks.includes(c.rank) && c.suit !== flushSuit);
+        if (!pairMatch) return null;
+        const filler = finalRemaining.find(c => c !== pairMatch && !hand1.includes(c) && c.suit !== flushSuit);
+        const hand2 = [pairMatch, filler];
+        
+        return { board, hand1, hand2 };
+    },
+    
+    // Three-card board straight - both need two cards
+    function threeCardBoardStraight() {
+        const deck = shuffle(createDeck());
+        
+        // Board: 3 connected cards + 2 random
+        const midVal = 6 + Math.floor(Math.random() * 5); // 6-10
+        const board = [];
+        
+        for (let v = midVal; v <= midVal + 2; v++) {
+            const card = deck.find(c => c.value === v);
+            if (card) board.push(card);
+        }
+        
+        const remaining = removeCards(deck, board);
+        const randoms = remaining.filter(c => 
+            c.value < midVal - 2 || c.value > midVal + 4
+        ).slice(0, 2);
+        board.push(...randoms);
+        
+        if (new Set(board.map(c => c.suit)).size === 1) return null;
+        
+        const finalRemaining = removeCards(deck, board);
+        
+        // Hand 1: completes straight from top
+        const top1 = finalRemaining.find(c => c.value === midVal + 3);
+        const top2 = finalRemaining.find(c => c.value === midVal + 4);
+        if (!top1 || !top2) return null;
+        const hand1 = [top1, top2];
+        
+        // Hand 2: pair (doesn't complete straight)
+        const boardVal = board[0].value;
+        const pairCard = finalRemaining.find(c => c.value === boardVal);
+        if (!pairCard) return null;
+        const filler = finalRemaining.find(c => c !== pairCard && !hand1.includes(c));
+        const hand2 = [pairCard, filler];
+        
+        return { board, hand1, hand2 };
+    },
+    
+    // Ace-high flush vs King-high flush
+    function aceHighVsKingHighFlush() {
+        const suit = SUITS[Math.floor(Math.random() * 4)];
+        const deck = shuffle(createDeck());
+        
+        // Get all cards of the flush suit
+        const suitedCards = sortByValue(deck.filter(c => c.suit === suit));
+        const ace = suitedCards.find(c => c.value === 14);
+        const king = suitedCards.find(c => c.value === 13);
+        
+        if (!ace || !king) return null;
+        
+        // Board: 3 medium flush cards
+        const mediumFlush = suitedCards.filter(c => c.value >= 5 && c.value <= 10).slice(0, 3);
+        const board = [...mediumFlush];
+        
+        // Add 2 non-suited cards
+        const nonSuited = deck.filter(c => c.suit !== suit);
+        board.push(nonSuited[0], nonSuited[1]);
+        
+        const finalRemaining = removeCards(deck, board);
+        
+        // Hand 1: Ace flush
+        const filler1 = finalRemaining.find(c => c.suit !== suit);
+        const hand1 = [ace, filler1];
+        
+        // Hand 2: King flush
+        const filler2 = finalRemaining.find(c => c.suit !== suit && c !== filler1);
+        const hand2 = [king, filler2];
+        
+        return { board, hand1, hand2 };
+    },
+    
+    // Sneaky straight flush vs regular flush
+    function sneakyStraightFlush() {
+        const suit = SUITS[Math.floor(Math.random() * 4)];
+        const deck = shuffle(createDeck());
+        
+        // Board: 3 suited cards that could make straight flush
+        const startVal = 5 + Math.floor(Math.random() * 5); // 5-9
+        const board = [];
+        
+        for (let v = startVal; v <= startVal + 2; v++) {
+            const card = deck.find(c => c.value === v && c.suit === suit);
+            if (card) board.push(card);
+        }
+        
+        if (board.length < 3) return null;
+        
+        // Add 2 non-suited cards
+        const remaining = removeCards(deck, board);
+        const nonSuited = remaining.filter(c => c.suit !== suit).slice(0, 2);
+        board.push(...nonSuited);
+        
+        const finalRemaining = removeCards(deck, board);
+        
+        // Hand 1: completes straight flush
+        const sf1 = finalRemaining.find(c => c.value === startVal + 3 && c.suit === suit);
+        const sf2 = finalRemaining.find(c => c.value === startVal + 4 && c.suit === suit);
+        if (!sf1 || !sf2) return null;
+        const hand1 = [sf1, sf2];
+        
+        // Hand 2: regular flush (high cards of suit)
+        const highFlush = finalRemaining.filter(c => c.suit === suit && c.value > startVal + 4);
+        if (highFlush.length < 2) return null;
+        const hand2 = highFlush.slice(0, 2);
+        
+        return { board, hand1, hand2 };
     }
 ];
 
@@ -441,6 +1230,7 @@ function renderWwHands() {
     wwHand1El.innerHTML = '';
     wwHand2El.innerHTML = '';
     
+    // Display cards in dealt order (random, like real poker)
     for (const card of wwHand1) {
         wwHand1El.appendChild(createCardElement(card));
     }

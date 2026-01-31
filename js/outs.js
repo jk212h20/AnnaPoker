@@ -256,13 +256,13 @@ function renderOutsBoard() {
 
 // Render both hands
 function renderOutsHands() {
-    // Your hand
+    // Your hand - display in dealt order (random, like real poker)
     yourHandEl.innerHTML = '';
     for (const card of yourHand) {
         yourHandEl.appendChild(createCardElement(card));
     }
     
-    // Opponent hand
+    // Opponent hand - display in dealt order (random, like real poker)
     opponentHandEl.innerHTML = '';
     for (const card of opponentHand) {
         opponentHandEl.appendChild(createCardElement(card));

@@ -374,10 +374,8 @@ function newNameHandRound() {
 function renderNhCards() {
     nhCardsEl.innerHTML = '';
     
-    // Sort cards by value for cleaner display
-    const sortedCards = sortByValue([...nhCards]);
-    
-    for (const card of sortedCards) {
+    // Show cards in random order (as dealt)
+    for (const card of nhCards) {
         nhCardsEl.appendChild(createCardElement(card));
     }
 }

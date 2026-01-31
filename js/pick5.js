@@ -103,10 +103,8 @@ function newPick5Round() {
 function renderPick5Cards() {
     p5CardsEl.innerHTML = '';
     
-    // Sort cards by value for cleaner display
-    const sortedCards = sortByValue([...p5Cards]);
-    
-    for (const card of sortedCards) {
+    // Show cards in random order (as dealt)
+    for (const card of p5Cards) {
         const cardEl = createCardElement(card);
         cardEl.classList.add('p5-card');
         cardEl.dataset.cardString = cardToString(card);

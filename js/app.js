@@ -36,6 +36,8 @@ const outsMode = document.getElementById('outs-mode');
 const whichwinsMode = document.getElementById('whichwins-mode');
 const namehandMode = document.getElementById('namehand-mode');
 const pick5Mode = document.getElementById('pick5-mode');
+const findnutsMode = document.getElementById('findnuts-mode');
+const readboardMode = document.getElementById('readboard-mode');
 
 // Initialize the app
 function init() {
@@ -56,6 +58,12 @@ function init() {
     
     // Initialize pick 5 mode
     initPick5Mode();
+    
+    // Initialize find nuts mode
+    initFindNutsMode();
+    
+    // Initialize read board mode
+    initReadBoardMode();
     
     // Start with ranking mode
     newRound();
@@ -107,7 +115,9 @@ function switchMode(mode) {
     whichwinsMode.classList.add('hidden');
     namehandMode.classList.add('hidden');
     pick5Mode.classList.add('hidden');
-    document.body.classList.remove('outs-theme', 'whichwins-theme', 'namehand-theme', 'pick5-theme');
+    findnutsMode.classList.add('hidden');
+    readboardMode.classList.add('hidden');
+    document.body.classList.remove('outs-theme', 'whichwins-theme', 'namehand-theme', 'pick5-theme', 'findnuts-theme', 'readboard-theme');
     
     // Show selected mode
     if (mode === 'ranking') {
@@ -129,6 +139,14 @@ function switchMode(mode) {
         pick5Mode.classList.remove('hidden');
         document.body.classList.add('pick5-theme');
         newPick5Round();
+    } else if (mode === 'findnuts') {
+        findnutsMode.classList.remove('hidden');
+        document.body.classList.add('findnuts-theme');
+        newFindNutsRound();
+    } else if (mode === 'readboard') {
+        readboardMode.classList.remove('hidden');
+        document.body.classList.add('readboard-theme');
+        newReadBoardRound();
     }
 }
 
@@ -144,12 +162,23 @@ function newRound() {
     rankingsEl.classList.add('hidden');
     instructionEl.style.display = 'block';
     
-    // Generate new scenario
-    if (shouldUseTemplate()) {
-        const template = getRandomTemplate();
-        currentBoard = template.board;
-        currentHands = template.hands;
-    } else {
+    // Generate new scenario with fallback on error
+    try {
+        if (shouldUseTemplate()) {
+            const template = getRandomTemplate();
+            if (template && template.board && template.hands && template.hands.length === 4) {
+                currentBoard = template.board;
+                currentHands = template.hands;
+            } else {
+                // Template invalid, fall back to random
+                generateRandomScenario();
+            }
+        } else {
+            generateRandomScenario();
+        }
+    } catch (e) {
+        // On any error, fall back to random generation
+        console.warn('Template generation failed, using random:', e);
         generateRandomScenario();
     }
     
@@ -204,6 +233,7 @@ function renderHands() {
         const holeCardsEl = document.createElement('div');
         holeCardsEl.className = 'hole-cards';
         
+        // Display cards in dealt order (random, like real poker)
         for (const card of hand) {
             holeCardsEl.appendChild(createCardElement(card));
         }
@@ -221,10 +251,32 @@ function renderHands() {
     }
 }
 
+// Reset selection - unselect all hands
+function resetSelection() {
+    if (gameEnded) return;
+    if (userOrder.length === 0) return;
+    
+    // Reset state
+    userOrder = [];
+    selectionCount = 0;
+    
+    // Re-render hands to clear all selections
+    renderHands();
+}
+
 // Handle hand selection
 function selectHand(index, element) {
     if (gameEnded) return;
-    if (userOrder.includes(index)) return; // Already selected
+    
+    // If already selected, unselect it (only if it's the last selected)
+    const selectedIndex = userOrder.indexOf(index);
+    if (selectedIndex !== -1) {
+        // Only allow unselecting the last selected hand
+        if (selectedIndex === userOrder.length - 1) {
+            unselectHand(index);
+        }
+        return;
+    }
     
     // Add to user order
     userOrder.push(index);
@@ -252,6 +304,30 @@ function selectHand(index, element) {
     if (selectionCount === 4) {
         endRound();
     }
+}
+
+// Unselect a hand (only the last selected one)
+function unselectHand(index) {
+    // Remove from user order
+    userOrder.pop();
+    selectionCount--;
+    
+    // Find the hand element and reset its state
+    const handEls = document.querySelectorAll('.hand');
+    const handEl = handEls[index];
+    
+    // Remove selected state
+    handEl.classList.remove('selected');
+    
+    // Remove order badge
+    const badge = handEl.querySelector('.order-badge');
+    if (badge) {
+        badge.remove();
+    }
+    
+    // Clear hand name
+    const handNameEl = handEl.querySelector('.hand-name');
+    handNameEl.textContent = '';
 }
 
 // End the round and show results
