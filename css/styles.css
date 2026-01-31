@@ -1614,6 +1614,188 @@ header h1 {
     }
 }
 
+/* ==================== HAND STRENGTH MODE STYLES ==================== */
+
+/* Hand Strength Mode Color Theme - Purple/Violet */
+.handstrength-theme {
+    --bg-color: #1e1a2e;
+    --accent: #b388ff;
+    --success: #4ecca3;
+    --hand-bg: #2a2540;
+    --hand-selected: #3d3560;
+    --hand-correct: #1b4332;
+}
+
+.hs-board {
+    margin-bottom: 12px;
+}
+
+.hs-hero-section {
+    background: var(--hand-bg);
+    border-radius: 10px;
+    padding: 14px;
+    text-align: center;
+    margin-bottom: 12px;
+}
+
+.hs-hero-section h3 {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+}
+
+.hs-hero-section .cards {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 8px;
+}
+
+.hs-hero-desc {
+    font-size: 0.95rem;
+    color: var(--accent);
+    font-weight: 500;
+}
+
+.hs-question {
+    text-align: center;
+    padding: 8px 0 16px;
+}
+
+.hs-question p {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+}
+
+.hs-question strong {
+    color: var(--accent);
+}
+
+.hs-options {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    padding: 0 0 12px;
+}
+
+.hs-option {
+    padding: 16px 12px;
+    border: 2px solid var(--hand-bg);
+    border-radius: 10px;
+    background: var(--hand-bg);
+    color: var(--text-color);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.hs-option:hover {
+    border-color: var(--accent);
+}
+
+.hs-option:active {
+    transform: scale(0.95);
+}
+
+.hs-option.selected {
+    border-color: var(--accent);
+    background: var(--hand-selected);
+}
+
+.hs-option.correct {
+    border-color: var(--success);
+    background: var(--hand-correct);
+}
+
+.hs-option.wrong {
+    border-color: var(--danger);
+    background: var(--hand-wrong);
+}
+
+.hs-option:disabled {
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
+.hs-count {
+    font-size: 1.4rem;
+    font-weight: bold;
+}
+
+.hs-pct {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.hs-explanation {
+    text-align: center;
+    padding: 8px 0;
+}
+
+.hs-explanation-text {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    padding: 12px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 8px;
+}
+
+.hs-explanation-text strong {
+    color: var(--accent);
+}
+
+#hs-result-message {
+    font-size: 1.4rem;
+    margin-bottom: 16px;
+}
+
+.result.perfect #hs-result-message {
+    color: var(--success);
+}
+
+.result.failed #hs-result-message {
+    color: var(--danger);
+}
+
+.handstrength-theme .menu-item.active {
+    background: rgba(179, 136, 255, 0.1);
+}
+
+/* Responsive adjustments for Hand Strength */
+@media (max-width: 360px) {
+    .hs-option {
+        padding: 12px 8px;
+    }
+    
+    .hs-count {
+        font-size: 1.2rem;
+    }
+    
+    .hs-pct {
+        font-size: 0.7rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .hs-option {
+        padding: 20px 16px;
+    }
+    
+    .hs-count {
+        font-size: 1.6rem;
+    }
+    
+    .hs-options {
+        gap: 14px;
+    }
+}
+
 /* Hidden utility */
 .hidden {
     display: none !important;

@@ -38,6 +38,7 @@ const namehandMode = document.getElementById('namehand-mode');
 const pick5Mode = document.getElementById('pick5-mode');
 const findnutsMode = document.getElementById('findnuts-mode');
 const readboardMode = document.getElementById('readboard-mode');
+const handstrengthMode = document.getElementById('handstrength-mode');
 
 // Initialize the app
 function init() {
@@ -64,6 +65,9 @@ function init() {
     
     // Initialize read board mode
     initReadBoardMode();
+    
+    // Initialize hand strength mode
+    initHandStrengthMode();
     
     // Start with ranking mode
     newRound();
@@ -117,7 +121,8 @@ function switchMode(mode) {
     pick5Mode.classList.add('hidden');
     findnutsMode.classList.add('hidden');
     readboardMode.classList.add('hidden');
-    document.body.classList.remove('outs-theme', 'whichwins-theme', 'namehand-theme', 'pick5-theme', 'findnuts-theme', 'readboard-theme');
+    handstrengthMode.classList.add('hidden');
+    document.body.classList.remove('outs-theme', 'whichwins-theme', 'namehand-theme', 'pick5-theme', 'findnuts-theme', 'readboard-theme', 'handstrength-theme');
     
     // Show selected mode
     if (mode === 'ranking') {
@@ -147,6 +152,10 @@ function switchMode(mode) {
         readboardMode.classList.remove('hidden');
         document.body.classList.add('readboard-theme');
         newReadBoardRound();
+    } else if (mode === 'handstrength') {
+        handstrengthMode.classList.remove('hidden');
+        document.body.classList.add('handstrength-theme');
+        newHandStrengthRound();
     }
 }
 
