@@ -33,6 +33,9 @@ function initHandStrengthMode() {
     nextHsBtn.addEventListener('click', newHandStrengthRound);
 }
 
+// Store beating hands for display
+let hsBeatingHands = [];
+
 // Count how many opponent hands beat hero's hand
 function countBeatingHands(board, heroHand) {
     // Get remaining deck (exclude board and hero hand)
@@ -46,6 +49,7 @@ function countBeatingHands(board, heroHand) {
     let beatsHero = 0;
     let tiesHero = 0;
     let losesToHero = 0;
+    hsBeatingHands = [];
     
     // Check all possible opponent 2-card combinations
     for (let i = 0; i < remaining.length; i++) {
@@ -56,6 +60,11 @@ function countBeatingHands(board, heroHand) {
             const comparison = compareHands(oppEval, heroEval);
             if (comparison > 0) {
                 beatsHero++;
+                hsBeatingHands.push({
+                    cards: oppHand,
+                    eval: oppEval,
+                    desc: getHandDescription(oppEval)
+                });
             } else if (comparison === 0) {
                 tiesHero++;
             } else {
@@ -63,6 +72,9 @@ function countBeatingHands(board, heroHand) {
             }
         }
     }
+    
+    // Sort beating hands strongest to weakest
+    hsBeatingHands.sort((a, b) => compareHands(b.eval, a.eval));
     
     return {
         beatsHero,
@@ -562,14 +574,58 @@ function selectHsOption(option, element) {
         hsResultEl.className = 'result failed';
     }
     
-    // Show explanation
+    // Show explanation with list of beating hands
     const pct = ((hsCorrectCount / hsTotalCombos) * 100).toFixed(1);
-    hsExplanationEl.innerHTML = `
+    let explanationHtml = `
         <div class="hs-explanation-text">
             Out of <strong>${hsTotalCombos}</strong> possible opponent hands,<br>
             <strong>${hsCorrectCount}</strong> (${pct}%) beat your hand.
         </div>
     `;
+    
+    // Show the beating hands list (strongest to weakest)
+    if (hsBeatingHands.length > 0) {
+        explanationHtml += '<div class="hs-beating-list">';
+        explanationHtml += '<div class="hs-beating-header">Hands that beat you (strongest → weakest):</div>';
+        
+        // Group by hand description to show counts
+        const grouped = {};
+        for (const h of hsBeatingHands) {
+            if (!grouped[h.desc]) {
+                grouped[h.desc] = [];
+            }
+            grouped[h.desc].push(h);
+        }
+        
+        // Display each group
+        for (const desc of Object.keys(grouped)) {
+            const hands = grouped[desc];
+            explanationHtml += `<div class="hs-beating-group">`;
+            explanationHtml += `<div class="hs-beating-desc">${desc} <span class="hs-beating-count">(${hands.length} combo${hands.length > 1 ? 's' : ''})</span></div>`;
+            explanationHtml += `<div class="hs-beating-combos">`;
+            
+            // Show up to 8 combos per group, then indicate more
+            const showMax = 8;
+            for (let i = 0; i < Math.min(hands.length, showMax); i++) {
+                const h = hands[i];
+                const c1 = h.cards[0];
+                const c2 = h.cards[1];
+                const color1 = (c1.suit === '♥' || c1.suit === '♦') ? 'red' : 'black';
+                const color2 = (c2.suit === '♥' || c2.suit === '♦') ? 'red' : 'black';
+                explanationHtml += `<span class="hs-combo"><span class="${color1}">${c1.rank}${c1.suit}</span><span class="${color2}">${c2.rank}${c2.suit}</span></span>`;
+            }
+            if (hands.length > showMax) {
+                explanationHtml += `<span class="hs-combo-more">+${hands.length - showMax} more</span>`;
+            }
+            explanationHtml += `</div></div>`;
+        }
+        
+        explanationHtml += '</div>';
+    } else {
+        explanationHtml += '<div class="hs-no-beats">🎉 You have the nuts! No hand beats you.</div>';
+    }
+    
+    hsExplanationEl.innerHTML = explanationHtml;
     
     // Update stats
     updateHsStats();

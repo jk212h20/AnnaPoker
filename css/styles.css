@@ -1750,6 +1750,81 @@ header h1 {
     color: var(--accent);
 }
 
+.hs-beating-list {
+    margin-top: 16px;
+    text-align: left;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.hs-beating-header {
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+.hs-beating-group {
+    margin-bottom: 12px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 8px;
+    padding: 10px;
+}
+
+.hs-beating-desc {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 6px;
+}
+
+.hs-beating-count {
+    font-weight: normal;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+}
+
+.hs-beating-combos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.hs-combo {
+    display: inline-flex;
+    background: var(--card-bg);
+    border-radius: 4px;
+    padding: 3px 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    gap: 1px;
+}
+
+.hs-combo .red {
+    color: #e63946;
+}
+
+.hs-combo .black {
+    color: #1d3557;
+}
+
+.hs-combo-more {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    padding: 3px 6px;
+}
+
+.hs-no-beats {
+    font-size: 1.1rem;
+    color: var(--success);
+    text-align: center;
+    padding: 16px;
+    margin-top: 12px;
+}
+
 #hs-result-message {
     font-size: 1.4rem;
     margin-bottom: 16px;
